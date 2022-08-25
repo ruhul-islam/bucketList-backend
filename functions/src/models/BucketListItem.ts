@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import BucketListIdea from "./BucketListIdea";
-import Consequence from "./Consequence";
+import Consequences from "./Consequences";
 
 export default interface BucketListItem {
   _id?: ObjectId;
   idea: string | BucketListIdea;
   date: string;
   category: string;
-  consequence: string | Consequence;
+  consequence: string | Consequences;
 }
