@@ -6,5 +6,5 @@ import bucketListRouter from "./routes/bucketListRouter";
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/bucketList", bucketListRouter);
+app.use("/bucket-list", bucketListRouter);
 export const api = functions.https.onRequest(app);
