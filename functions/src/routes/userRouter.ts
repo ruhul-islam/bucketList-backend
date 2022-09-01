@@ -1,4 +1,5 @@
 import express from "express";
+// import { bucket } from "firebase-functions/v1/storage";
 import { getClient } from "../db";
 import BucketListItem from "../models/BucketListItem";
 import User from "../models/User";
@@ -14,8 +15,11 @@ userRouter.get("/:uid", async (req, res) => {
   try {
     const uid: string = req.params.uid;
     const client = await getClient();
-    const cursor = client.db().collection<User>("users").find({ uid });
-    const results = await cursor.toArray();
+    const results = await client
+      .db()
+      .collection<User>("users")
+      .findOne({ uid });
+    console.log(results);
     res.status(200);
     res.json(results);
   } catch (err) {
@@ -35,7 +39,7 @@ userRouter.post("/", async (req, res) => {
   }
 });
 
-userRouter.put("/:uid/bucket-list", async (req, res) => {
+userRouter.put("/:uid/bucket-list/add", async (req, res) => {
   try {
     const uid: string = req.params.uid;
     const client = await getClient();
@@ -44,9 +48,58 @@ userRouter.put("/:uid/bucket-list", async (req, res) => {
       .db()
       .collection<User>("users")
       .updateOne({ uid }, { $push: { bucketList: newBucketListItem } });
-    if (results.modifiedCount) {
+    console.log(results, newBucketListItem);
+    if (results.matchedCount) {
       res.status(200);
       res.json(newBucketListItem);
+    } else {
+      res.status(404);
+      res.send("User Not Found");
+    }
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
+userRouter.put("/:uid/bucket-list/remove", async (req, res) => {
+  try {
+    const uid: string = req.params.uid;
+    // const index: number = parseInt(req.params.index);
+    const idea: string = req.body.idea;
+    console.log(idea);
+    const client = await getClient();
+    const results = await client
+      .db()
+      .collection<User>("users")
+      .updateOne(
+        { uid },
+        {
+          $pull: { bucketList: { idea: idea } },
+        }
+      );
+    if (results.modifiedCount) {
+      res.sendStatus(200);
+    } else {
+      res.status(404);
+      res.send("User Not Found");
+    }
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
+userRouter.put("/:uid/following", async (req, res) => {
+  try {
+    const uid: string = req.params.uid;
+    const client = await getClient();
+    const newFriend: string = req.body.uid;
+    const results = await client
+      .db()
+      .collection<User>("users")
+      .updateOne({ uid }, { $push: { following: newFriend } });
+    if (results.modifiedCount) {
+      res.status(200);
+      res.json(newFriend);
     } else {
       res.status(404);
       res.send("User Not Found");
