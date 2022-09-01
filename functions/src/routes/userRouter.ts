@@ -109,4 +109,22 @@ userRouter.put("/:uid/following", async (req, res) => {
   }
 });
 
+userRouter.get("/search/:term", async (req, res) => {
+  try {
+    const term: string = req.params.term;
+    console.log(term);
+    const client = await getClient();
+    const results = await client
+      .db()
+      .collection<User[]>("users")
+      .find({ displayName: new RegExp(`${term}`, "i") })
+      .toArray();
+
+    res.status(200);
+    res.json(results);
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
 export default userRouter;
