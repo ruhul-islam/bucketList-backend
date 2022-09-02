@@ -109,6 +109,31 @@ userRouter.put("/:uid/following", async (req, res) => {
   }
 });
 
+userRouter.put("/:myUid/following/:friendUid", async (req, res) => {
+  try {
+    const myUid: string = req.params.myUid;
+    const friendUid: string = req.params.friendUid;
+    const client = await getClient();
+    const results = await client
+      .db()
+      .collection<User>("users")
+      .updateOne(
+        { myUid },
+        {
+          $pull: { following: friendUid },
+        }
+      );
+    if (results.modifiedCount) {
+      res.sendStatus(200);
+    } else {
+      res.status(404);
+      res.send("User Not Found");
+    }
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
 userRouter.get("/search/:term", async (req, res) => {
   try {
     const term: string = req.params.term;
