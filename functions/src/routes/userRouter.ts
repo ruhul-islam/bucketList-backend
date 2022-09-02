@@ -118,7 +118,7 @@ userRouter.put("/:myUid/following/:friendUid", async (req, res) => {
       .db()
       .collection<User>("users")
       .updateOne(
-        { myUid },
+        { uid: myUid },
         {
           $pull: { following: friendUid },
         }
@@ -127,7 +127,7 @@ userRouter.put("/:myUid/following/:friendUid", async (req, res) => {
       res.sendStatus(200);
     } else {
       res.status(404);
-      res.send("User Not Found");
+      res.send("User Not Found!");
     }
   } catch (err) {
     errorResponse(err, res);
