@@ -378,4 +378,21 @@ userRouter.get("/search/:term", async (req, res) => {
   }
 });
 
+userRouter.get("/:uid/friends/:friendUid", async (req, res) => {
+  try {
+    const uid: string = req.params.uid;
+    const friendUid: string = req.params.friendUid;
+    console.log("chris", uid, friendUid);
+    const client = await getClient();
+    const result = await client
+      .db()
+      .collection<User[]>("users")
+      .findOne({ uid: friendUid });
+    res.status(200);
+    res.json(result);
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
 export default userRouter;
