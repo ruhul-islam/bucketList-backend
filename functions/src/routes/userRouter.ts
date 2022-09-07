@@ -49,14 +49,14 @@ userRouter.get("/friends/:uid", async (req, res) => {
     const uid: string = req.params.uid;
     const client = await getClient();
     const result = await client.db().collection<User>("users").findOne({ uid });
-    let results: User[] | [] = [];
+    let results: User[] = [];
     for (let index = 0; index < result?.following?.length!; index++) {
       const element: string | undefined = result?.following![index];
       const singleFriend: User | null = await client
         .db()
         .collection<User>("users")
         .findOne({ uid: element });
-      results.push(singleFriend);
+      results.push(singleFriend!);
     }
     console.log(results);
     res.status(200);
