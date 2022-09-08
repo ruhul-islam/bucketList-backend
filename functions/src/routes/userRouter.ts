@@ -89,7 +89,17 @@ userRouter.put("/:uid/bucket-list/add", async (req, res) => {
     const results = await client
       .db()
       .collection<User>("users")
-      .updateOne({ uid }, { $push: { bucketList: newBucketListItem } });
+      .updateOne(
+        { uid },
+        {
+          $push: {
+            bucketList: {
+              $each: [newBucketListItem],
+              $position: 0,
+            },
+          },
+        }
+      );
     console.log(results, newBucketListItem);
     if (results.matchedCount) {
       res.status(200);
@@ -322,7 +332,17 @@ userRouter.put("/:uid/following", async (req, res) => {
     const results = await client
       .db()
       .collection<User>("users")
-      .updateOne({ uid }, { $push: { following: newFriend } });
+      .updateOne(
+        { uid },
+        {
+          $push: {
+            following: {
+              $each: [newFriend],
+              $position: 0,
+            },
+          },
+        }
+      );
     if (results.modifiedCount) {
       res.status(200);
       res.json(newFriend);
